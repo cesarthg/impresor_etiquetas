@@ -1,0 +1,21 @@
+# Ignorar entorno virtual
+venv/
+
+# Archivos de caché de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Archivos de dependencias
+*.log
+*.csv  # Si los archivos CSV son solo de prueba y no necesarios en el repo
+*.db   # Para bases de datos locales, si usas SQLite
+*.pdf  # Evita subir PDFs generados si no son esenciales
+
+# Configuración del sistema
+.DS_Store  # En macOS, archivos ocultos generados por Finder
+
+# Configuración de IDEs y editores de código
+.vscode/
+.idea/
