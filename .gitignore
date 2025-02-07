@@ -1,5 +1,9 @@
-# Ignorar entorno virtual
+# Ignorar entorno virtual y archivos innecesarios
 venv/
+bin/
+include/
+lib/
+pyvenv.cfg
 
 # Archivos de caché de Python
 __pycache__/
@@ -9,9 +13,11 @@ __pycache__/
 
 # Archivos de dependencias
 *.log
-*.csv  # Si los archivos CSV son solo de prueba y no necesarios en el repo
-*.db   # Para bases de datos locales, si usas SQLite
-*.pdf  # Evita subir PDFs generados si no son esenciales
+
+# Archivos de datos generados
+datos.csv
+codigos_lista.csv
+etiquetas.pdf  # Evita subir PDFs generados
 
 # Configuración del sistema
 .DS_Store  # En macOS, archivos ocultos generados por Finder
