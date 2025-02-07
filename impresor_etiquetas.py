@@ -2,7 +2,7 @@ import os
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, landscape
 import pandas as pd
 
 # Ruta de la fuente Inter-Bold (ajústala si es necesario)
@@ -21,25 +21,29 @@ def create_labels(csv_file, output_pdf):
     Cada línea del CSV genera una página con un rectángulo y el texto centrado.
     """
     # Cargar datos del CSV
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file, dtype=str)  # Leer datos como strings para preservar ceros iniciales
 
     # Asegurarse de que hay datos
     if df.empty:
         raise ValueError("El archivo CSV está vacío. Agrega datos antes de ejecutar el script.")
 
     # Obtener la primera columna como lista de etiquetas
-    labels = df.iloc[:, 0].astype(str).tolist()
+    labels = df.iloc[:, 0].tolist()
 
-    # Crear el PDF
-    c = canvas.Canvas(output_pdf, pagesize=letter)
+    # Crear el PDF en orientación horizontal
+    c = canvas.Canvas(output_pdf, pagesize=landscape(letter))
     c.setFont("Inter-Bold", 40)
 
     # Dimensiones de la página
-    width, height = letter
+    width, height = landscape(letter)
 
     for label in labels:
-        # Dibujar un rectángulo para la etiqueta
-        c.rect(50, 200, width - 100, height - 400)
+        # Configurar la fuente y tamaño de fuente
+        c.setFont("Inter-Bold", 40)
+
+        # Dibujar un rectángulo con borde grueso y esquinas redondeadas
+        c.setLineWidth(3)  # Grosor del borde
+        c.roundRect(50, 200, width - 100, height - 400, 20)  # Esquinas redondeadas con radio 20
 
         # Calcular ancho del texto para centrarlo
         text_width = c.stringWidth(label, "Inter-Bold", 40)
