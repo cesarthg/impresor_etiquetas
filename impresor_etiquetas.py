@@ -1,8 +1,10 @@
 import os
+import qrcode
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, landscape
+from reportlab.lib.utils import ImageReader
 import pandas as pd
 
 # Ruta de la fuente Inter-Bold (ajústala si es necesario)
@@ -18,7 +20,7 @@ pdfmetrics.registerFont(TTFont("Inter-Bold", font_path))
 def create_labels(csv_file, output_pdf):
     """
     Genera un PDF con etiquetas a partir de un archivo CSV.
-    Cada línea del CSV genera una página con un rectángulo y el texto centrado.
+    Cada línea del CSV genera una página con un rectángulo, texto centrado y un código QR.
     """
     # Cargar datos del CSV
     df = pd.read_csv(csv_file, dtype=str)  # Leer datos como strings para preservar ceros iniciales
@@ -49,19 +51,40 @@ def create_labels(csv_file, output_pdf):
         rect_height = height - 400
         c.roundRect(rect_x, rect_y, rect_width, rect_height, 20)  # Esquinas redondeadas con radio 20
 
+        # Generar el código QR
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(label)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill='black', back_color='white')
+        qr_img_path = f"qr_{label}.png"
+        qr_img.save(qr_img_path)
+
+        # Calcular dimensiones del QR
+        qr_size = 100  # Tamaño del QR
+        qr_x = rect_x + rect_width - qr_size - 20  # Espacio desde el borde derecho del rectángulo
+        qr_y = rect_y + (rect_height - qr_size) / 2  # Centrado verticalmente
+
         # Calcular ancho del texto para centrarlo horizontalmente
         text_width = c.stringWidth(label, "Inter-Bold", 60)
-        x_position = rect_x + (rect_width - text_width) / 2
-
-        # Calcular la altura del texto para centrarlo verticalmente
-        text_height = 60  # Tamaño de la fuente
-        y_position = rect_y + (rect_height - text_height) / 2
+        x_position = rect_x + (rect_width - text_width - qr_size - 20) / 2  # Ajustar para incluir el QR
+        y_position = rect_y + (rect_height - 60) / 2  # Centrado verticalmente
 
         # Dibujar el texto centrado
         c.drawString(x_position, y_position, label)
 
+        # Dibujar el código QR
+        c.drawImage(ImageReader(qr_img_path), qr_x, qr_y, width=qr_size, height=qr_size)
+
         # Crear una nueva página
         c.showPage()
+
+        # Eliminar la imagen QR temporal
+        os.remove(qr_img_path)
 
     # Guardar el PDF
     c.save()
