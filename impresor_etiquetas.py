@@ -23,7 +23,7 @@ def create_labels(csv_file, output_pdf):
     Cada línea del CSV genera una página con un rectángulo, texto centrado y un código QR.
     """
     # Cargar datos del CSV
-    df = pd.read_csv(csv_file, dtype=str)  # Leer datos como strings para preservar ceros iniciales
+    df = pd.read_csv(csv_file, dtype=str, encoding='utf-8')  # Leer datos como strings para preservar ceros iniciales
 
     # Asegurarse de que hay datos
     if df.empty:
